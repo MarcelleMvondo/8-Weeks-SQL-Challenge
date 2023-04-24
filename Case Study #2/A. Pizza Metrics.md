@@ -203,7 +203,7 @@ where cancellation is null
 ### 9. What was the total volume of pizzas ordered for each hour of the day?
 
 ````sql
-   select date_part('hour', order_time) as hour, count(order_id) as pizzas_ordered_per_hour
+select date_part('hour', order_time) as hour, count(order_id) as pizzas_ordered_per_hour
 from _customer_orders
 group by hour
 order by hour
@@ -221,23 +221,9 @@ order by hour
 ### 10. What was the volume of orders for each day of the week?
 
 ````sql
-with day_of_week as
-(
-	select *,
-		case 
-			when extract(isodow from order_time)=1 then 'Monday'
-			when extract(isodow from order_time)=2 then 'Tuesday'
-			when extract(isodow from order_time)=3 then 'Wednesday'
-			when extract(isodow from order_time)=4 then 'Thursday '
-			when extract(isodow from order_time)=5 then 'Friday'
-			when extract(isodow from order_time)=6 then 'Saturday'
-			when extract(isodow from order_time)=7 then 'Sunday'
-		end as day
-	from _customer_orders
-)
-select day, count(order_id) as pizzas_ordered_per_day
-from day_of_week
-group by day
+SELECT TO_CHAR(order_time, 'Day') AS day_name, count(order_id)
+FROM _customer_orders
+GROUP BY day_name
   ````
   
 | day | pizzas_ordered_per_day |
