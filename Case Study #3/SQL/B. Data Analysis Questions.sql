@@ -23,20 +23,38 @@ GROUP BY plan_name,p.plan_id
 ORDER BY plan_id
 
 -- 4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?
-WITH count_customer AS
-(
-	SELECT 
-		CASE 
-			WHEN plan_name = 'churn' THEN COUNT(DISTINCT customer_id)
-		END AS churned_customers,
-		CASE 
-			WHEN plan_name = 'trial' THEN COUNT(DISTINCT customer_id)
-		END AS total_customers
-	FROM subscriptions AS s
-	JOIN plans AS p
-		ON p.plan_id = s.plan_id
-	GROUP BY plan_name
-)
-SELECT SUM(churned_customers) AS churned_customers, 
-	ROUND((SUM(churned_customers)/SUM(total_customers))*100,1) AS churn_percentage
-FROM count_customer
+SELECT COUNT(*) AS churned_customers,
+  ROUND(100 * COUNT(*)::NUMERIC / 
+		(SELECT COUNT(DISTINCT customer_id)FROM subscriptions),1) AS churn_percentage
+FROM subscriptions s
+JOIN plans p
+  ON s.plan_id = p.plan_id
+WHERE s.plan_id = 4
+
+-- 5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?
+
+-- 6. What is the number and percentage of customer plans after their initial free trial?
+
+-- 7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?
+SELECT plan_name, COUNT(DISTINCT customer_id) AS customer_count,
+	ROUND(100 * COUNT(*)::NUMERIC / 
+		(SELECT COUNT(DISTINCT customer_id)FROM subscriptions),1) AS percentage
+FROM plans AS p
+JOIN subscriptions AS s 
+	ON s.plan_id = p.plan_id
+WHERE start_date <= '2020-12-31'
+GROUP BY plan_name
+
+-- 8. How many customers have upgraded to an annual plan in 2020?
+SELECT COUNT(DISTINCT customer_id) AS customers_number
+FROM subscriptions
+WHERE plan_id = 3
+	AND DATE_PART('year',start_date) = 2020
+	
+-- 9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?
+
+-- 10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)
+
+-- 11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?
+
+
