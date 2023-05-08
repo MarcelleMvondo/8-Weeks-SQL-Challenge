@@ -6,7 +6,7 @@ SELECT
 FROM clean_weekly_sales
 
 -- 2. What range of week numbers are missing from the dataset?
-WITH week_number_cte AS 
+WITH week_number AS 
 (
   SELECT GENERATE_SERIES(1,52) AS week_number
 )
